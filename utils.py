@@ -21,3 +21,25 @@ def get_Horizon(img):
     left = int(((gray.shape[1] - x) * vy / vx) + y)
 
     return ((gray.shape[1]-1,  left), (0, right))
+
+def get_border(left, right, shape):
+    '''
+    Find border of the horizon in the image.
+
+    Input : Left and right co-ordinate of the border && Shape(h, w) of the image.
+    Output : List of length w containing co-ordinates of the border.
+    '''
+
+    height, width = shape
+    border = [0]*(width)
+    m = (right[1] - left[1]) / (right[0] - left[0])
+
+    for i in range(width):
+        y = int((m * (i - left[0])) + left[1])
+        if y < 0:
+            y = 0
+        elif y >= height:
+            y = height-1
+        border[i] = y
+
+    return border
