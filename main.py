@@ -5,12 +5,12 @@ from utils import *
 path = "/home/harish/Documents/Okulo Aerosapce/Collision-Avoidance-System/Dataset/Images/1.png"
 img = cv2.imread(path)
 img = cv2.resize(img, (700, 400))
-img = cv2.flip(img, 1)
 
 left, right = get_Horizon(img)
-print(left, right)
+border = get_border(left, right, img.shape[0:2])
+C = CMO(img, border)
 
-cv2.line(img, left, right, 255, 2)
-cv2.imshow("Horizon", img)
+cv2.imshow("Input", img)
+cv2.imshow("CMO", C)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
