@@ -43,3 +43,11 @@ def get_border(left, right, shape):
         border[i] = y
 
     return border
+
+def CMO(img, border):
+    I_op = cv2.erode(cv2.dilate(img, (5, 5)), (5, 5))
+    I_cls = cv2.dilate(cv2.erode(img, (5, 5)), (5, 5))
+    return I_op - I_cls
+
+def temporal_filter(img):
+    pass
