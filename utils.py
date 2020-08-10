@@ -44,7 +44,14 @@ def get_border(left, right, shape):
 
     return border
 
-def CMO(img, border):
+def CMO(img):
+    '''
+    Find small objects in the image.
+
+    Input : Image.
+    Output : List of length w containing co-ordinates of the border.
+    '''
+
     I_op = cv2.erode(cv2.dilate(img, (5, 5)), (5, 5))
     I_cls = cv2.dilate(cv2.erode(img, (5, 5)), (5, 5))
     return I_op - I_cls
