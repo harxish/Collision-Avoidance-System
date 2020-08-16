@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import ndimage
 import cv2
 
 def get_Horizon(img):
@@ -56,5 +57,18 @@ def CMO(img):
     I_cls = cv2.dilate(cv2.erode(img, (5, 5)), (5, 5))
     return I_op - I_cls
 
-def temporal_filter(img):
-    pass
+def find_grp(image_, border):
+    '''
+    Find small objects in the image.
+
+    Input : Image and Border.
+    Output : List of length w containing co-ordinates of the border.
+    '''
+    filter_ = np.ones((5, 5))
+    image = ndimage.convolve(image_, filter_)
+    return image
+
+def find_obj(img, border):
+    
+    im2, contours = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    return im2, contours
