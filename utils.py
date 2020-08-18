@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 from scipy import ndimage
 import cv2
 
@@ -57,18 +58,37 @@ def CMO(img):
     I_cls = cv2.dilate(cv2.erode(img, (5, 5)), (5, 5))
     return I_op - I_cls
 
-def find_grp(image_, border):
-    '''
-    Find small objects in the image.
+def detect_(image):
 
-    Input : Image and Border.
-    Output : List of length w containing co-ordinates of the border.
-    '''
-    filter_ = np.ones((5, 5))
-    image = ndimage.convolve(image_, filter_)
-    return image
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    img = np.where(img <= 50, img, 255)
+    kernel = np.ones((10, 10), np.uint8)
+    img = cv2.dilate(img, kernel)
 
-def find_obj(img, border):
-    
-    im2, contours = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    return im2, contours
+    return img
+
+
+def detect(img):
+
+    params = cv2.SimpleBlobDetector_Params()
+
+    params.filterByArea = True
+    params.minArea = 1500
+
+    # Filter by Circularity
+    params.filterByCircularity = True
+    params.minCircularity = 0.1
+
+    # Filter by Convexity
+    params.filterByConvexity = True
+    params.minConvexity = 0.87
+
+    # Filter by Inertia
+    params.filterByInertia = True
+    params.minInertiaRatio = 0.01
+
+
+    detector = cv2.SimpleBlobDetector_create(params)
+    keypts = detector.detect(img)
+
+    return keypts
