@@ -23,7 +23,7 @@ def image():
     cv2.destroyAllWindows()
 
 def video():
-    path = "/home/harish/Documents/Okulo Aerosapce/Collision-Avoidance-System/Dataset/Videos/Clip_1.mov"
+    path = "/home/harish/Documents/Okulo Aerosapce/Collision-Avoidance-System/Dataset/Videos/Clip_3.mov"
     cap = cv2.VideoCapture(path)
     while True:
         ret, img = cap.read()
@@ -44,4 +44,4 @@ def video():
             break
 
 if __name__ == "__main__":
-    image()
+    video()
