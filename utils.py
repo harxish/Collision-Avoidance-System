@@ -53,7 +53,7 @@ def EMWA(border, prev_border, t):
         prev_border = [0]*len(border)
 
     border, prev_border = np.array(border), np.array(prev_border)
-    beta = 0.945
+    beta = 0.98
     n =  beta*prev_border + (1-beta)*border
     d = 1 - beta**t
     return n / d if t == 1 else n
