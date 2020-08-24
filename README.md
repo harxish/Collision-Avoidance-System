@@ -7,6 +7,9 @@ Input:
 Border and Filter:
 ![](images/CMO.png)
 
+Video:
+![](images/stable.gif)
+
 ---
 
 ### Files :
