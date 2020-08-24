@@ -46,49 +46,51 @@ def get_border(left, right, shape):
 
     return border
 
-def CMO(img):
+
+def EMWA(border, prev_border, t):
+
+    if prev_border == []:
+        prev_border = [0]*len(border)
+
+    border, prev_border = np.array(border), np.array(prev_border)
+    beta = 0.945
+    n =  beta*prev_border + (1-beta)*border
+    d = 1 - beta**t
+    return n / d if t == 1 else n
+
+def detect(image):
     '''
-    Find small objects in the image.
+    Find keypts small objects in the image.
 
     Input : Image.
     Output : List of length w containing co-ordinates of the border.
     '''
 
-    I_op = cv2.erode(cv2.dilate(img, (5, 5)), (5, 5))
-    I_cls = cv2.dilate(cv2.erode(img, (5, 5)), (5, 5))
-    return I_op - I_cls
+    I_op = cv2.erode(cv2.dilate(image, (5, 5)), (5, 5))
+    I_cls = cv2.dilate(cv2.erode(image, (5, 5)), (5, 5))
+    img = I_op - I_cls
 
-def detect_(image):
-
-    img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = np.where(img <= 50, img, 255)
     kernel = np.ones((10, 10), np.uint8)
     img = cv2.dilate(img, kernel)
 
-    return img
-
-
-def detect(img):
-
     params = cv2.SimpleBlobDetector_Params()
-
-    params.filterByArea = True
-    params.minArea = 1500
-
-    # Filter by Circularity
-    params.filterByCircularity = True
-    params.minCircularity = 0.1
-
-    # Filter by Convexity
-    params.filterByConvexity = True
-    params.minConvexity = 0.87
-
-    # Filter by Inertia
-    params.filterByInertia = True
-    params.minInertiaRatio = 0.01
-
-
+    params.blobColor = 255.0
     detector = cv2.SimpleBlobDetector_create(params)
     keypts = detector.detect(img)
 
     return keypts
+
+
+def is_obstacle(pt, left, right):
+    '''
+    Remove noise from potentail objects.
+
+    Input : List of potential obstacles, border-left, border-right.
+    Output : Keypts (x, y) of potential obstacles without noise.
+    '''
+    
+    a, b = right[1] - left[1], left[0] - right[0] 
+    c = a*(left[0]) + b*(left[1])
+    return True if(a * pt[0] + b * pt[1] - c < 0) else False
