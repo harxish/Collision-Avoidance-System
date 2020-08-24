@@ -1,13 +1,13 @@
 # Collision-Avoidance-System
 A Vision Based Sense and Avoid System for Small UAV's.
 
-Input:
+### Input:
 ![](images/Input.png)
 
-Border and Filter:
+### Border and Filter:
 ![](images/CMO.png)
 
-Video:
+### Video:
 ![](images/stable.gif)
 
 ---
@@ -23,7 +23,7 @@ utils.py  ->  All utility functions
 ### TODO :
 
 - [x] Border and CMO filter
-- [ ] HMM Filters
+- [x] Obstacle Detection
 - [ ] Tracking obstacle
 
 ---
@@ -33,3 +33,6 @@ utils.py  ->  All utility functions
 - ~~CNN~~
 - ~~YOLO~~
 - ~~LK~~
+- ~~HMM~~
+- ~~Temportal Filtering~~
+- ~~Adaptive Thresholding~~
