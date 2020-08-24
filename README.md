@@ -34,5 +34,5 @@ utils.py  ->  All utility functions
 - ~~YOLO~~
 - ~~LK~~
 - ~~HMM~~
-- ~~Temportal Filtering~~
+- ~~Temporal Filtering~~
 - ~~Adaptive Thresholding~~
