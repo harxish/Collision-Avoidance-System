@@ -48,6 +48,12 @@ def get_border(left, right, shape):
 
 
 def EMWA(border, prev_border, t):
+    '''
+    Calculates Exponential Moving Weighted Average of the border.
+
+    Input : Current location of the border, previous values of the border, time.
+    Output : EMWA on the border with respect to prev_border values.
+    '''
 
     if prev_border == []:
         prev_border = [0]*len(border)
@@ -58,12 +64,13 @@ def EMWA(border, prev_border, t):
     d = 1 - beta**t
     return n / d if t == 1 else n
 
-def detect(image):
+
+def detect(image, left, right):
     '''
-    Find keypts small objects in the image.
+    Find coordinates for small obstacles in the image.
 
     Input : Image.
-    Output : List of length w containing co-ordinates of the border.
+    Output : Coordinates of potential obstacles.
     '''
 
     I_op = cv2.erode(cv2.dilate(image, (5, 5)), (5, 5))
@@ -80,17 +87,49 @@ def detect(image):
     detector = cv2.SimpleBlobDetector_create(params)
     keypts = detector.detect(img)
 
-    return keypts
-
-
-def is_obstacle(pt, left, right):
-    '''
-    Remove noise from potentail objects.
-
-    Input : List of potential obstacles, border-left, border-right.
-    Output : Keypts (x, y) of potential obstacles without noise.
-    '''
-    
+    objects = []
     a, b = right[1] - left[1], left[0] - right[0] 
     c = a*(left[0]) + b*(left[1])
-    return True if(a * pt[0] + b * pt[1] - c < 0) else False
+
+    for i in keypts:
+        if(a * (i.pt[0]+10) + b * (i.pt[1]+10) - c < 0):
+            objects.append(i.pt)
+
+    return objects
+
+
+def objects_to_track(img_size, objects, tracker):
+    '''
+    Removes noise from the obstacle array.
+
+    Input : Image Dimension, Object array, tracker array.
+    Output : Object array, tracker array.
+    '''
+    
+    partition = 50
+    ret_obj = []
+    grid = np.zeros((partition, partition))
+    sol = np.zeros((partition, partition))
+
+    for obj in objects:
+        x, y = map(int, [obj[0]*partition/img_size[1], obj[1]*partition/img_size[0]])
+        grid[x, y] = 1.
+
+    if len(tracker) < 20 : 
+        tracker.append(grid)
+    else:
+        tracker.pop(0)
+        tracker.append(grid)
+
+    for i in tracker:
+        sol += i
+
+    kernel = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]])
+    sol = ndimage.convolve(sol, kernel, mode='constant')
+
+    for obj in objects:
+        x, y = map(int, [obj[0]*partition/img_size[1], obj[1]*partition/img_size[0]])
+        if sol[x, y] >= 3:
+            ret_obj.append(obj)
+
+    return ret_obj, tracker
