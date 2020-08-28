@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from tqdm import tqdm
 from scipy import ndimage
 import cv2
@@ -23,6 +24,40 @@ def get_Horizon(img):
     left = int(((gray.shape[1] - x) * vy / vx) + y)
 
     return ((gray.shape[1]-1,  left), (0, right))
+
+def get_horizon_v2(img):
+    '''
+    Find co-ordinates of the horizon in the image.
+
+    Input : BGR Image.
+    Output : (x1, y1) and (x2, y2) of the Horizon.
+    '''
+    
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blurred_image = cv2.GaussianBlur(gray, (3, 3), 0)
+    v, sigma = np.median(blurred_image), .33
+    lower = int(max(0, (1.0 - sigma) * v))
+    upper = int(min(255, (1.0 + sigma) * v))
+    edged = cv2.Canny(blurred_image, lower, upper)
+
+    dilated = cv2.dilate(edged, np.ones((3, 3), dtype=np.uint8))
+    lines = cv2.HoughLines(dilated, 1, np.pi / 100, threshold = 200, min_theta=np.pi / 3, max_theta=2 * np.pi / 3)
+
+    if lines is not None:
+        rho = np.mean([line[0][0] for line in lines])
+        theta = np.mean([line[0][1] for line in lines])
+        
+        a = math.cos(theta)
+        b = math.sin(theta)
+        x0 = a * rho
+        y0 = b * rho
+        pt1 = (int(x0 + 10000 * (-b)), int(y0 + 10000 * (a)))
+        pt2 = (int(x0 - 10000 * (-b)), int(y0 - 10000 * (a)))
+
+        return pt1, pt2
+        
+    else:
+        return ((0, 0), (0, 0))
 
 def get_border(left, right, shape):
     '''
