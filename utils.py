@@ -4,9 +4,10 @@ from tqdm import tqdm
 from scipy import ndimage
 import cv2
 
-def get_Horizon(img):
+def get_Horizon_fitLine(img):
     '''
     Find co-ordinates of the horizon in the image.
+    Using fit line method.
 
     Input : BGR Image.
     Output : (x1, y1) and (x2, y2) of the Horizon.
@@ -25,9 +26,10 @@ def get_Horizon(img):
 
     return ((gray.shape[1]-1,  left), (0, right))
 
-def get_horizon_v2(img):
+def get_Horizon_Hough(img):
     '''
     Find co-ordinates of the horizon in the image.
+    Using Hough Lines.
 
     Input : BGR Image.
     Output : (x1, y1) and (x2, y2) of the Horizon.
@@ -69,6 +71,8 @@ def get_border(left, right, shape):
 
     height, width = shape
     border = [0]*(width)
+    if left == right:
+        return border
     m = (right[1] - left[1]) / (right[0] - left[0])
 
     for i in range(width):
@@ -83,6 +87,12 @@ def get_border(left, right, shape):
 
 
 def EMWA(border, prev_border, t):
+    '''
+    Calculate Exponential Moving Weighted Average of the border.
+
+    Input : Current predicted border, previous EMWA border, time.
+    Output : EMWA of the current border.
+    '''
 
     if prev_border == []:
         prev_border = [0]*len(border)
@@ -92,6 +102,7 @@ def EMWA(border, prev_border, t):
     n =  beta*prev_border + (1-beta)*border
     d = 1 - beta**t
     return n / d if t == 1 else n
+
 
 def detect(image):
     '''
