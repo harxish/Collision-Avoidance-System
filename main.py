@@ -9,20 +9,14 @@ def image():
 
     left, right = get_Horizon_fitLine(img)
     border = get_border(left, right, img.shape[0:2])
-    keypts = detect(img)
-    objects = []
-
-    for i in keypts:
-        if(is_obstacle(i.pt, left ,right) == True):
-            objects.append(i.pt)
+    objects = detect(img, left, right)
 
     for i in objects:
         start_point = ( int(i[0] - 70), int(i[1] - 70))
         end_point = (int(i[0] + 70), int(i[1] + 70))
         img = cv2.rectangle(img, start_point, end_point, (0, 0, 255), 1)
 
-    # cv2.imwrite('/home/harish/Pictures/Input.png', img)
-    # cv2.imwrite('/home/harish/Pictures/CMO.png', im2)
+    objects_to_track((400, 700), objects, None)
 
     cv2.line(img, left, right, 255, 2)
     cv2.imshow("Result", img)
@@ -35,6 +29,7 @@ def video():
     t = 1
     prev_border = []
     prev_border_ = []
+    tracker = []
 
     while True:
         ret, img = cap.read()
@@ -42,7 +37,6 @@ def video():
             break
 
         img = cv2.resize(img, (700, 400))
-
         left_, right_ = get_Horizon_Hough(img)
         border_ = get_border(left_, right_, img.shape[0:2])
         border_ = EMWA(border_, prev_border_, t)
@@ -60,12 +54,8 @@ def video():
         left, right = (left + left_) / 2, (right + right_) / 2
         left, right = tuple(left.astype(int)), tuple(right.astype(int))
         
-        keypts = detect(img)
-        objects = []
-
-        for i in keypts:
-            if(is_obstacle(i.pt, left ,right) == True):
-                objects.append(i.pt)
+        objects = detect(img, left, right)
+        objects, tracker = objects_to_track((400, 700), objects, tracker)
 
         for i in objects:
             start_point = ( int(i[0] - 10),int(i[1] -10))
