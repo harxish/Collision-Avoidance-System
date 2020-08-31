@@ -1,14 +1,62 @@
+
 import numpy as np
 import math
 from tqdm import tqdm
 from scipy import ndimage
 import cv2
 
+def preprocessing(img):
+    clahe = cv2.createCLAHE(clipLimit = 40)
+    contrasted_image = clahe.apply(img)
+    blurred = cv2.GaussianBlur(contrasted_image,(5,5),0)
+    #cv2.imshow("blurred",blurred)
+    return blurred
+
+def detect_fast_features(img):
+    fast = cv2.FastFeatureDetector_create()
+    keypts  = fast.detect(img)
+    objects = []
+    for i in keypts:
+        objects.append((i.pt[0],i.pt[1]))
+    objects = np.array(objects)
+    return objects
+    
+def tracking(old_frame,new_frame,prev_kps):
+    
+    flow = cv2.calcOpticalFlowPyrLK(old_frame,new_frame,
+                                prev_kps, None)
+    
+    matched_keypoints = match_keypoints(flow, prev_kps)
+    return matched_keypoints
+
+def match_keypoints(optical_flow, prev_kps):
+    """Match optical flow keypoints
+
+    :param optical_flow: output of cv2.calcOpticalFlowPyrLK
+    :param prev_kps: keypoints that were passed to cv2.calcOpticalFlowPyrLK to create optical_flow
+    :return: tuple of (cur_matched_kp, prev_matched_kp)
+    """
+    cur_kps, status, err = optical_flow
+
+    # storage for keypoints with status 1
+    prev_matched_kp = []
+    cur_matched_kp = []
+
+    if status is None:
+        return cur_matched_kp, prev_matched_kp
+
+    for i, matched in enumerate(status):
+        # store coords of keypoints that appear in both
+        if matched:
+            prev_matched_kp.append(prev_kps[i])
+            cur_matched_kp.append(cur_kps[i])
+
+    return cur_matched_kp, prev_matched_kp
+
 def get_Horizon_fitLine(img):
     '''
     Find co-ordinates of the horizon in the image.
     Using fit line method.
-
     Input : BGR Image.
     Output : (x1, y1) and (x2, y2) of the Horizon.
     '''
@@ -30,7 +78,6 @@ def get_Horizon_Hough(img):
     '''
     Find co-ordinates of the horizon in the image.
     Using Hough Lines.
-
     Input : BGR Image.
     Output : (x1, y1) and (x2, y2) of the Horizon.
     '''
@@ -64,7 +111,6 @@ def get_Horizon_Hough(img):
 def get_border(left, right, shape):
     '''
     Find border of the horizon in the image.
-
     Input : Left and right co-ordinate of the border && Shape(h, w) of the image.
     Output : List of length w containing co-ordinates of the border.
     '''
@@ -89,7 +135,6 @@ def get_border(left, right, shape):
 def EMWA(border, prev_border, t):
     '''
     Calculates Exponential Moving Weighted Average of the border.
-
     Input : Current location of the border, previous values of the border, time.
     Output : EMWA on the border with respect to prev_border values.
     '''
@@ -107,7 +152,6 @@ def EMWA(border, prev_border, t):
 def detect(image, left, right):
     '''
     Find coordinates for small obstacles in the image.
-
     Input : Image.
     Output : Coordinates of potential obstacles.
     '''
@@ -123,8 +167,14 @@ def detect(image, left, right):
 
     params = cv2.SimpleBlobDetector_Params()
     params.blobColor = 255.0
-    detector = cv2.SimpleBlobDetector_create(params)
-    keypts = detector.detect(img)
+    # detector = cv2.SimpleBlobDetector_create(params)
+    # keypts = detector.detect(img)
+    fast = cv2.FastFeatureDetector_create() 
+
+# Detect keypoints with non max suppression
+    keypts= fast.detect(img, None)
+
+    
 
     objects = []
     a, b = right[1] - left[1], left[0] - right[0] 
@@ -140,7 +190,6 @@ def detect(image, left, right):
 def objects_to_track(img_size, objects, tracker):
     '''
     Removes noise from the obstacle array.
-
     Input : Image Dimension, Object array, tracker array.
     Output : Object array, tracker array.
     '''
