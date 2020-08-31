@@ -1,6 +1,13 @@
 # Collision-Avoidance-System
 A Vision Based Sense and Avoid System for Small UAV's.
 
+---
+
+# FAST Feature Pipeline
+
+
+---
+
 ### Input:
 ![](images/Input.png)
 
@@ -24,6 +31,13 @@ utils.py  ->  All utility functions
 
 - [x] Border and CMO filter
 - [x] Obstacle Detection
+- [ ] CLAHE contrast enhancement
+- [ ] FAST Features
+- [ ] Track features using LK
+- [ ] Register consecutive frames
+- [ ] Compute difference frame
+- [ ] Compute FAST Features
+- [ ] Compute bounding box
 - [ ] Tracking obstacle
 
 ---

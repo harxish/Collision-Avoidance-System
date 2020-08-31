@@ -168,7 +168,7 @@ def objects_to_track(img_size, objects, tracker):
 
     for obj in objects:
         x, y = map(int, [obj[0]*partition/img_size[1], obj[1]*partition/img_size[0]])
-        if sol[x, y] >= 3:
+        if sol[x, y] >= 10:
             ret_obj.append(obj)
 
     return ret_obj, tracker
