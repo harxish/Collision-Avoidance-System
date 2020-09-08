@@ -2,7 +2,7 @@ import numpy as np
 import math
 import cv2
 
-from SORT.sort import Sort
+from SORT import Sort
 from tqdm import tqdm
 from scipy import ndimage
 
