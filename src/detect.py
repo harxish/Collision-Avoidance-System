@@ -1,9 +1,7 @@
 import numpy as np
-import math
 import cv2
 
 from SORT import Sort
-from tqdm import tqdm
 from scipy import ndimage
 
 mot = Sort()
@@ -76,7 +74,3 @@ def objects_to_track(img_size, objects, tracker):
             ret_obj.append(obj)
 
     return ret_obj, tracker
-
-
-# def track(keypoints):
-    

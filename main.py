@@ -1,9 +1,9 @@
 import numpy as np
 import cv2
 
-from border import Horizon
-from utils import *
-from SORT import Sort
+from src.border import Horizon
+from src.detect import *
+from src.SORT import Sort
 
 sort = Sort()
 
