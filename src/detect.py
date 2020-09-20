@@ -1,10 +1,6 @@
 import numpy as np
 import cv2
-
-from SORT import Sort
 from scipy import ndimage
-
-mot = Sort()
 
 def detect(image, left, right):
     '''

@@ -3,9 +3,7 @@ import cv2
 
 from src.border import Horizon
 from src.detect import *
-from src.SORT import Sort
 
-sort = Sort()
 
 def video():
     path = "/home/harish/Documents/Okulo Aerosapce/Dataset/Videos/Clip_1.mov"
@@ -23,19 +21,12 @@ def video():
         
         objects = detect(img, left, right)
         objects, tracker = objects_to_track((400, 700), objects, tracker)
-        objs = np.empty((0, 5))
         
         for i in objects:
             start_point = ( int(i[0] - 10), int(i[1] -10))
             end_point = (int(i[0] + 10), int(i[1] + 10))
             x = list(end_point + start_point + (1, ))
-            objs = np.insert(objs, 0, [x])
             img = cv2.rectangle(img, start_point, end_point, (0, 0, 255), 1)
-            
-        if len(objects):
-            print(objs)
-            print(objs.shape)
-            print(sort.update(objs))
                     
         cv2.line(img, left, right, 255, 2)
 
