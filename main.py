@@ -26,11 +26,12 @@ def video():
         objects = detector(img, left, right)
         
         for i in objects:
-            start_point = ( int(i[0] - 10), int(i[1] -10))
-            end_point = (int(i[0] + 10), int(i[1] + 10))
+            start_point = ( int(i[0] - 5), int(i[1] - 5))
+            end_point = (int(i[0] + 5), int(i[1] + 5))
             img = cv2.rectangle(img, start_point, end_point, (0, 0, 255), 1)
 
             if (annotations[frame_count][0] == 1):
+                print(annotations[frame_count])
                 det = [start_point[0], start_point[1], end_point[0], end_point[1]]
                 status = check_Detection(det, annotations[frame_count][1:])
 
@@ -45,7 +46,7 @@ def video():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    print(frame_count, annotations_time)
+    print(detector_time, annotations_time)
 
 if __name__ == "__main__":
     video()
